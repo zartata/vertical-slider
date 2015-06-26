@@ -28,22 +28,28 @@ jQuery( document ).ready(function( $ ) {
         sections.height( $( window ).height() );
 
         // Current section
-        currentSection
-            .css('opacity', 1)
-            .children('.vs-section-inside').velocity( animationsSettings.visible, 0 );
+        TweenLite.to(currentSection, 0, {
+            opacity: 1,
+            z: '0%',
+            y: '0%'
+        });
 
         // Bottom section
-        if( currentSection.prevAll('.vs-section').index() > -1 ) {
-            currentSection.prevAll('.vs-section')
-                .css('opacity', 1)
-                .children('.vs-section-inside').velocity( animationsSettings.top, 0 );
+        if( currentSection.prev('.vs-section').index() > -1 ) {
+            TweenLite.to(currentSection.prev('.vs-section'), 0, {
+                opacity: 1,
+                z: '0%',
+                y: '-100%'
+            });
         }
 
         // Top section
-        if( currentSection.nextAll('.vs-section').index() > -1 ) {
-            currentSection.nextAll('.vs-section')
-                .css('opacity', 1)
-                .children('.vs-section-inside').velocity( animationsSettings.bottom, 0 );
+        if( currentSection.next('.vs-section').index() > -1 ) {
+            TweenLite.to(currentSection.next('.vs-section'), 0, {
+                opacity: 1,
+                z: '0%',
+                y: '100%'
+            });
         }
 
         // Bind events
@@ -76,32 +82,45 @@ jQuery( document ).ready(function( $ ) {
             if( sectionIndex > -1 && sectionIndex < sections.length ) {
 
                 if( sectionIndex > currentSection.index() ) { // Requested section is after the current one
-                    nextSection = currentSection.next('.vs-section');
-                    animation   = animationsSettings.top;
+                    nextSection   = currentSection.next('.vs-section');
+                    animationFrom = '100%';
+                    animationTo   = '-100%';
                 } else { // Requested section is before the current one
-                    nextSection = currentSection.prev('.vs-section');
-                    animation   = animationsSettings.bottom;
+                    nextSection   = currentSection.prev('.vs-section');
+                    animationFrom = '-100%';
+                    animationTo   = '100%';
                 }
 
                 // Actual animation
                 currentSection.removeClass('active');
-                currentSection.children('.vs-section-inside').velocity( animation, animationsSettings.easing, animationsSettings.duration ).end();
 
-                nextSection.addClass('active');
-                nextSection.children('.vs-section-inside').velocity(animationsSettings.visible, animationsSettings.easing, animationsSettings.duration, function() {
+                var currentSectionTween = TweenLite.fromTo(currentSection, 0.8, {
+                    z: '0%',
+                    y: '0%'
+                }, {
+                    z: '0%',
+                    y: animationTo
+                });
+
+                var nextSectionTween = TweenLite.fromTo(nextSection, 0.8,{
+                    z: '0%',
+                    y: animationFrom,
+                    opacity: 1
+                }, {
+                    z: '0%',
+                    y: '0%',
+                    opacity: 1,
+
+                    onComplete: function() {
+
+                        nextSection.addClass('active');
+
                         // Animations stopped
                         animating      = false;
                         // Update current section variable
-                        currentSection = sections.filter('.active');
-                    });
-
-                // currentSection.removeClass('active');
-                // nextSection.addClass('active');
-
-                // // Animations stopped
-                // animating      = false;
-                // // Update current section variable
-                // currentSection = sections.filter('.active');
+                        currentSection = nextSection;
+                    }
+                });
 
 
             } else {
@@ -217,37 +236,37 @@ jQuery( document ).ready(function( $ ) {
 
 });
 
-// Register Velocity effects
-// None
-$.Velocity
-    .RegisterEffect('translateUp', {
-    	defaultDuration: 1,
-        calls: [
-            [ { translateZ: 0, translateY: '-100%' }, 1 ]
-        ]
-    });
+// // Register Velocity effects
+// // None
+// $.Velocity
+//     .RegisterEffect('translateUp', {
+//     	defaultDuration: 1,
+//         calls: [
+//             [ { translateZ: 0, translateY: '-100%' }, 1 ]
+//         ]
+//     });
 
-$.Velocity
-    .RegisterEffect('translateDown', {
-    	defaultDuration: 1,
-        calls: [
-            [ { translateZ: 0, translateY: '100%' }, 1 ]
-        ]
-    });
+// $.Velocity
+//     .RegisterEffect('translateDown', {
+//     	defaultDuration: 1,
+//         calls: [
+//             [ { translateZ: 0, translateY: '100%' }, 1 ]
+//         ]
+//     });
 
-$.Velocity
-    .RegisterEffect('translateNone', {
-    	defaultDuration: 1,
-        calls: [
-            [ { translateZ: 0, translateY: '0', opacity: '1' }, 1 ]
-        ]
-    });
+// $.Velocity
+//     .RegisterEffect('translateNone', {
+//     	defaultDuration: 1,
+//         calls: [
+//             [ { translateZ: 0, translateY: '0', opacity: '1' }, 1 ]
+//         ]
+//     });
 
-// Parallax
-$.Velocity
-    .RegisterEffect('translateUp.half', {
-    	defaultDuration: 1,
-        calls: [
-            [ { translateZ: 0, translateY: '-50%' }, 1 ]
-        ]
-    });
+// // Parallax
+// $.Velocity
+//     .RegisterEffect('translateUp.half', {
+//     	defaultDuration: 1,
+//         calls: [
+//             [ { translateZ: 0, translateY: '-50%' }, 1 ]
+//         ]
+//     });
